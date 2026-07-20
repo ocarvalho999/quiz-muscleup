@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Diagnóstico Muscle Up — Descubra qual erro está bloqueando seu primeiro Muscle Up</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cor-primaria: #00ff87;
+      --cor-fundo: #0a0a0a;
+      --cor-card: #111111;
+      --cor-borda: #1e1e1e;
+      --cor-texto: #f0f0f0;
+      --cor-texto-fraco: #888888;
+      --cor-texto-suave: #aaaaaa;
+      --cor-perigo: #ff4757;
+      --max-w: 480px;
+    }
+
+    html, body {
+      min-height: 100%; background: var(--cor-fundo); color: var(--cor-texto);
+      font-family: 'Inter', sans-serif; overflow-x: hidden;
+    }
+
+    /* ── TELAS ──────────────────────────────────────────────── */
+    .tela {
+      min-height: 100dvh; max-width: var(--max-w); margin: 0 auto;
+      display: none; flex-direction: column;
+      padding: 24px 20px; position: relative;
+    }
+    .tela.ativa { display: flex; }
+
+    /* ── BARRA DE PROGRESSO ─────────────────────────────────── */
+    #barra-wrap {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      background: var(--cor-fundo); border-bottom: 1px solid var(--cor-borda);
+    }
+    #barra-track { height: 4px; background: var(--cor-borda); }
+    #barra-fill { height: 4px; background: var(--cor-primaria); width: 0%; transition: width .4s ease; }
+    #barra-info {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 14px 5px; font-size: 10px; font-weight: 700;
+    }
+    #barra-pct { color: var(--cor-primaria); }
+    #barra-fase { color: var(--cor-texto-fraco); font-style: italic; font-weight: 400; }
+
+    /* ── CANVAS PARTÍCULAS ───────────────────────────────────── */
+    #canvas-p { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+    .tela > * { position: relative; z-index: 1; }
+
+    /* ── SPLASH ─────────────────────────────────────────────── */
+    #tela-splash { justify-content: space-between; padding-top: 64px; padding-bottom: 40px; gap: 32px; }
+    .splash-logo { display: flex; justify-content: center; margin-bottom: -8px; }
+    .splash-logo img { width: 100px; height: auto; }
+    .splash-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(0,255,135,.08); border: 1px solid rgba(0,255,135,.2);
+      padding: 6px 14px; border-radius: 100px; font-size: 11px;
+      color: var(--cor-primaria); font-weight: 700; width: fit-content;
+      letter-spacing: .5px;
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cor-primaria); animation: blink 1.4s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .splash-content { display: flex; flex-direction: column; gap: 18px; }
+    .splash-headline { font-size: 26px; font-weight: 900; line-height: 1.2; color: var(--cor-texto); }
+    .splash-headline em { color: var(--cor-primaria); font-style: normal; }
+    .splash-sub { font-size: 14px; color: var(--cor-texto-fraco); line-height: 1.65; }
+    .splash-sub strong { color: var(--cor-texto); }
+    .splash-proof { display: flex; gap: 14px; flex-wrap: wrap; }
+    .splash-proof-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--cor-texto-suave); }
+    .splash-cta-area { display: flex; flex-direction: column; gap: 10px; }
+    .btn-cta {
+      width: 100%; padding: 18px; background: var(--cor-primaria); color: #000;
+      font-size: 16px; font-weight: 900; border: none; border-radius: 10px;
+      cursor: pointer; text-transform: uppercase; letter-spacing: .8px;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .btn-cta:active { transform: scale(.98); }
+    .splash-disclaimer { text-align: center; font-size: 11px; color: var(--cor-texto-fraco); }
+
+    /* ── QUIZ ───────────────────────────────────────────────── */
+    #tela-quiz { padding-top: 68px; gap: 0; }
+    .quiz-modulo {
+      font-size: 10px; font-weight: 700; color: var(--cor-primaria);
+      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px;
+    }
+    .quiz-numero { font-size: 12px; color: var(--cor-texto-fraco); margin-bottom: 14px; font-weight: 600; }
+    .quiz-pergunta { font-size: 21px; font-weight: 900; line-height: 1.3; color: var(--cor-texto); margin-bottom: 6px; }
+    .quiz-contexto { font-size: 13px; color: var(--cor-texto-suave); margin-bottom: 22px; font-style: italic; line-height: 1.5; }
+    .opcoes-container { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+    .opcao-btn {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--cor-card); border: 2px solid var(--cor-borda);
+      padding: 14px 16px; border-radius: 10px; cursor: pointer;
+      transition: border-color .2s, background .2s, transform .1s;
+      text-align: left; width: 100%;
+    }
+    .opcao-btn:active { transform: scale(.99); }
+    .opcao-btn.selecionada { border-color: var(--cor-primaria); background: rgba(0,255,135,.05); }
+    .opcao-letra {
+      width: 28px; height: 28px; min-width: 28px; border-radius: 50%;
+      background: var(--cor-borda); color: var(--cor-texto-fraco);
+      font-size: 12px; font-weight: 700; display: flex; align-items: center;
+      justify-content: center; text-transform: uppercase; transition: background .2s, color .2s;
+    }
+    .opcao-btn.selecionada .opcao-letra { background: var(--cor-primaria); color: #000; }
+    .opcao-texto { font-size: 14px; font-weight: 600; color: var(--cor-texto); line-height: 1.4; }
+
+    /* Insight flash */
+    #insight-wrap { margin-top: 14px; min-height: 36px; }
+    .quiz-insight {
+      display: flex; align-items: flex-start; gap: 8px;
+      background: rgba(0,255,135,.07); border-left: 3px solid var(--cor-primaria);
+      padding: 10px 14px; border-radius: 0 8px 8px 0;
+      font-size: 13px; color: var(--cor-primaria); line-height: 1.5;
+      animation: fadeUp .3s ease;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── PROCESSANDO ────────────────────────────────────────── */
+    #tela-processando {
+      justify-content: center; align-items: center; text-align: center; gap: 28px;
+    }
+    .proc-titulo { font-size: 20px; font-weight: 900; }
+    .proc-sub { font-size: 14px; color: var(--cor-texto-fraco); line-height: 1.5; }
+    .proc-bar-wrap { width: 100%; background: var(--cor-borda); border-radius: 4px; height: 6px; }
+    .proc-bar-fill { height: 6px; background: var(--cor-primaria); width: 0%; border-radius: 4px; transition: width .45s ease; }
+    .proc-etapa { font-size: 13px; color: var(--cor-primaria); font-weight: 600; min-height: 20px; margin-top: 8px; }
+    .proc-scan { display: flex; flex-direction: column; gap: 10px; width: 100%; text-align: left; }
+    .proc-scan-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; color: #444; transition: color .3s, opacity .3s;
+      opacity: .4;
+    }
+    .proc-scan-item.vis { color: var(--cor-texto); opacity: 1; }
+    .proc-scan-item .ck { color: var(--cor-primaria); font-size: 15px; flex-shrink: 0; }
+    .proc-credencial {
+      font-size: 12px; color: var(--cor-texto-fraco);
+      background: var(--cor-card); border: 1px solid var(--cor-borda);
+      border-radius: 8px; padding: 10px 14px;
+    }
+
+    /* ── CAPTURA ────────────────────────────────────────────── */
+    #tela-captura { justify-content: center; gap: 0; }
+    .cap-header { text-align: center; margin-bottom: 28px; }
+    .cap-icon { font-size: 52px; margin-bottom: 12px; }
+    .cap-titulo { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
+    .cap-sub { font-size: 14px; color: var(--cor-texto-fraco); line-height: 1.5; }
+    .campos { display: flex; flex-direction: column; gap: 14px; }
+    .campo-label { font-size: 11px; font-weight: 700; color: var(--cor-texto-suave); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .campo-input {
+      width: 100%; padding: 16px; background: var(--cor-card);
+      border: 2px solid var(--cor-borda); border-radius: 10px;
+      color: var(--cor-texto); font-size: 16px; font-family: inherit;
+      outline: none; transition: border-color .2s;
+    }
+    .campo-input:focus { border-color: var(--cor-primaria); }
+    .campo-input::placeholder { color: var(--cor-texto-fraco); }
+    .btn-cap {
+      width: 100%; padding: 18px; background: var(--cor-primaria); color: #000;
+      font-size: 16px; font-weight: 900; border: none; border-radius: 10px;
+      cursor: pointer; text-transform: uppercase; letter-spacing: .8px; margin-top: 4px;
+    }
+    .cap-privacidade { text-align: center; font-size: 11px; color: var(--cor-texto-fraco); margin-top: 10px; }
+
+    /* ── RESULTADO ──────────────────────────────────────────── */
+    #tela-resultado { padding-top: 32px; }
+    .res-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1.5px solid var(--cor-primaria); padding: 6px 14px;
+      border-radius: 100px; font-size: 10px; font-weight: 800;
+      color: var(--cor-primaria); text-transform: uppercase; letter-spacing: 1.5px;
+      margin-bottom: 16px; background: rgba(0,255,135,.06);
+    }
+    .res-titulo { font-size: 24px; font-weight: 900; line-height: 1.25; margin-bottom: 16px; }
+    .res-titulo em { color: var(--cor-primaria); font-style: normal; }
+    .res-copy { font-size: 14px; color: var(--cor-texto-suave); line-height: 1.7; margin-bottom: 20px; }
+    .res-copy p { margin-bottom: 10px; }
+    .res-box {
+      background: rgba(0,255,135,.05); border: 1px solid rgba(0,255,135,.15);
+      border-radius: 12px; padding: 18px; margin-bottom: 18px;
+    }
+    .res-box-label { font-size: 11px; font-weight: 700; color: var(--cor-primaria); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .res-box-texto { font-size: 14px; color: var(--cor-texto); line-height: 1.7; }
+    .res-box-texto strong { color: var(--cor-primaria); }
+    .res-aha {
+      background: #111; border: 1px solid #222;
+      border-radius: 12px; padding: 18px; margin-bottom: 20px;
+    }
+    .res-aha-label { font-size: 11px; font-weight: 700; color: #f0f0f0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .res-aha-texto { font-size: 14px; color: var(--cor-texto-suave); line-height: 1.75; }
+    .res-aha-texto strong { color: var(--cor-primaria); }
+    .res-ponte { font-size: 14px; color: var(--cor-texto-fraco); line-height: 1.65; margin-bottom: 24px; }
+    .res-cta {
+      width: 100%; padding: 18px; background: var(--cor-primaria); color: #000;
+      font-size: 15px; font-weight: 900; border: none; border-radius: 10px;
+      cursor: pointer; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px;
+    }
+    .res-cta-sub { text-align: center; font-size: 11px; color: var(--cor-texto-fraco); }
+
+    /* ── OFERTA ─────────────────────────────────────────────── */
+    #tela-oferta { padding-top: 32px; }
+    .oferta-urgencia {
+      background: rgba(255,71,87,.1); border: 1px solid rgba(255,71,87,.3);
+      border-radius: 8px; padding: 10px 16px; font-size: 13px;
+      color: #ff6b7a; font-weight: 700; text-align: center; margin-bottom: 20px;
+    }
+    .oferta-titulo { font-size: 22px; font-weight: 900; line-height: 1.25; margin-bottom: 10px; }
+    .oferta-titulo em { color: var(--cor-primaria); font-style: normal; }
+    .oferta-sub { font-size: 14px; color: var(--cor-texto-fraco); line-height: 1.65; margin-bottom: 20px; }
+    .oferta-itens { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .oferta-item { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--cor-texto); line-height: 1.4; }
+    .oferta-check { color: var(--cor-primaria); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .preco-box {
+      background: var(--cor-card); border: 1px solid var(--cor-borda);
+      border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px;
+    }
+    .preco-de { font-size: 14px; color: var(--cor-texto-fraco); text-decoration: line-through; }
+    .preco-por { font-size: 44px; font-weight: 900; color: var(--cor-primaria); line-height: 1.1; margin: 4px 0; }
+    .preco-label { font-size: 12px; color: var(--cor-texto-fraco); }
+    .preco-dia { font-size: 11px; color: var(--cor-texto-fraco); margin-top: 4px; }
+    .btn-oferta {
+      width: 100%; padding: 18px; background: var(--cor-primaria); color: #000;
+      font-size: 15px; font-weight: 900; border: none; border-radius: 10px;
+      cursor: pointer; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 14px;
+    }
+    .oferta-garantia {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: rgba(0,255,135,.04); border: 1px solid rgba(0,255,135,.1);
+      border-radius: 10px; padding: 14px; font-size: 13px;
+      color: var(--cor-texto-suave); line-height: 1.5; margin-bottom: 16px;
+    }
+    .garantia-icon { font-size: 22px; flex-shrink: 0; }
+    .oferta-prova { font-size: 12px; color: var(--cor-texto-fraco); text-align: center; line-height: 1.5; padding-bottom: 40px; }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas-p"></canvas>
+
+<!-- Barra de Progresso -->
+<div id="barra-wrap" style="display:none">
+  <div id="barra-track"><div id="barra-fill"></div></div>
+  <div id="barra-info">
+    <span id="barra-pct">0%</span>
+    <span id="barra-fase"></span>
+  </div>
+</div>
+
+<!-- SPLASH -->
+<section class="tela ativa" id="tela-splash">
+  <div class="splash-content">
+    <div class="splash-badge"><span class="badge-dot"></span>Diagnóstico Gratuito de Muscle Up</div>
+    <h1 class="splash-headline">
+      🚨 Você está cometendo um dos <em>5 erros</em> que impedem 87% dos praticantes de fazer o primeiro Muscle Up?
+    </h1>
+    <p class="splash-sub">
+      A maioria acredita que precisa ficar mais forte.<br>
+      Mas os melhores treinadores de calistenia concordam:<br><br>
+      <strong>O verdadeiro problema costuma ser técnica, explosão ou progressão.</strong><br><br>
+      Faça o diagnóstico e descubra o que realmente está travando o seu Muscle Up.
+    </p>
+    <div class="splash-proof">
+      <div class="splash-proof-item">🔥 <span>+1.200 diagnósticos realizados</span></div>
+      <div class="splash-proof-item">⏱ <span>Menos de 60 segundos</span></div>
+    </div>
+  </div>
+  <div class="splash-cta-area">
+    <button class="btn-cta" id="btn-iniciar">DESCOBRIR MEU ERRO AGORA →</button>
+    <p class="splash-disclaimer">100% gratuito • Resultado personalizado • Sem spam</p>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="tela" id="tela-quiz">
+  <p class="quiz-modulo" id="quiz-modulo"></p>
+  <p class="quiz-numero" id="quiz-numero"></p>
+  <h2 class="quiz-pergunta" id="quiz-pergunta"></h2>
+  <p class="quiz-contexto" id="quiz-contexto"></p>
+  <div class="opcoes-container" id="opcoes-container"></div>
+  <div id="insight-wrap"></div>
+</section>
+
+<!-- PROCESSANDO -->
+<section class="tela" id="tela-processando">
+  <p class="proc-titulo">🔍 Analisando seu diagnóstico...</p>
+  <p class="proc-sub">Cruzando suas respostas com padrões de +500 alunos</p>
+  <div style="width:100%">
+    <div class="proc-bar-wrap"><div class="proc-bar-fill" id="proc-bar"></div></div>
+    <p class="proc-etapa" id="proc-etapa">Iniciando análise...</p>
+  </div>
+  <div class="proc-scan" id="proc-scan"></div>
+  <p class="proc-credencial">Metodologia baseada em +500 alunos que já conquistaram o primeiro Muscle Up</p>
+</section>
+
+<!-- CAPTURA -->
+<section class="tela" id="tela-captura">
+  <div class="cap-header">
+    <div class="cap-icon">🎯</div>
+    <h2 class="cap-titulo">Seu diagnóstico está pronto.</h2>
+    <p class="cap-sub">Para onde enviamos sua análise completa?</p>
+  </div>
+  <div class="campos">
+    <div>
+      <p class="campo-label">Seu nome</p>
+      <input class="campo-input" type="text" id="campo-nome" placeholder="Como você se chama?" autocomplete="given-name">
+    </div>
+    <div>
+      <p class="campo-label">Seu WhatsApp</p>
+      <input class="campo-input" type="tel" id="campo-whatsapp" placeholder="(00) 00000-0000" autocomplete="tel">
+    </div>
+    <button class="btn-cap" id="btn-cap">Ver Meu Diagnóstico Muscle Up →</button>
+    <p class="cap-privacidade">🔒 Seu número é usado apenas para enviar sua análise. Sem spam.</p>
+  </div>
+</section>
+
+<!-- RESULTADO -->
+<section class="tela" id="tela-resultado">
+  <div id="res-conteudo"></div>
+</section>
+
+<!-- OFERTA -->
+<section class="tela" id="tela-oferta">
+  <div id="oferta-conteudo"></div>
+</section>
+
+<script>
+/* ============================================================
+   PERGUNTAS
+============================================================ */
+const PERGUNTAS = [
+  {
+    id:"p1", modulo:"DIAGNÓSTICO",
+    texto:"Há quanto tempo você treina calistenia ou musculação?",
+    contexto:"Sua base de treino é o ponto de partida do diagnóstico.",
+    opcoes:[
+      { letra:"A", texto:"Menos de 3 meses",   pontos:2,  ind:{base:15},          insight:"Todo começo tem seu desafio. Vamos descobrir exatamente onde você está." },
+      { letra:"B", texto:"3 a 6 meses",         pontos:4,  ind:{base:8},           insight:"Você já tem uma base. Agora é hora de afinar o que está travando." },
+      { letra:"C", texto:"6 meses a 2 anos",    pontos:8,  ind:{progressao:5},     insight:"Com esse tempo de treino, a resposta pode te surpreender." },
+      { letra:"D", texto:"Mais de 2 anos",      pontos:12, ind:{trajetoria:5},     insight:"Experiência tem. Então o problema é muito mais sutil do que parece." },
+    ]
+  },
+  {
+    id:"p2", modulo:"DIAGNÓSTICO",
+    texto:"Quantos dias por semana você treina?",
+    contexto:"",
+    opcoes:[
+      { letra:"A", texto:"1 a 2 dias",          pontos:2,  ind:{base:8}            },
+      { letra:"B", texto:"3 dias",              pontos:7,  ind:{}                  },
+      { letra:"C", texto:"4 a 5 dias",          pontos:10, ind:{}                  },
+      { letra:"D", texto:"6 ou 7 dias",         pontos:6,  ind:{progressao:6},     insight:"Atenção — treinar demais sem uma progressão pode ser um dos seus bloqueios." },
+    ]
+  },
+  {
+    id:"p3", modulo:"DIAGNÓSTICO",
+    texto:"Quantas barras você consegue fazer sem parar?",
+    contexto:"Seja honesto — esse dado é fundamental para o diagnóstico.",
+    opcoes:[
+      { letra:"A", texto:"Nenhuma ainda",        pontos:1,  ind:{base:22},          insight:"Sem problema — muitas pessoas chegam ao Muscle Up partindo desse ponto." },
+      { letra:"B", texto:"1 a 4 repetições",     pontos:4,  ind:{base:15},          insight:"Sua base está em construção. Mas já dá para mapear o caminho exato." },
+      { letra:"C", texto:"5 a 8 repetições",     pontos:9,  ind:{explosao:8},       insight:"Com esse nível de força, você provavelmente já está pronto. O que falta é outra coisa." },
+      { letra:"D", texto:"9 ou mais repetições", pontos:14, ind:{trajetoria:10, transicao:8}, insight:"Com 9+ barras, força definitivamente não é seu problema. O erro está em outro lugar." },
+    ]
+  },
+  {
+    id:"p4", modulo:"DIAGNÓSTICO",
+    texto:"Quantas flexões você faz sem parar?",
+    contexto:"",
+    opcoes:[
+      { letra:"A", texto:"Menos de 10",          pontos:2,  ind:{base:12}           },
+      { letra:"B", texto:"10 a 20",              pontos:5,  ind:{base:5}            },
+      { letra:"C", texto:"21 a 30",              pontos:9,  ind:{}                  },
+      { letra:"D", texto:"Mais de 30",           pontos:12, ind:{trajetoria:5},     insight:"Boa resistência de empurrar. Isso confirma que o bloqueio está na técnica." },
+    ]
+  },
+  {
+    id:"p5", modulo:"DIAGNÓSTICO",
+    texto:"Você já tentou fazer um Muscle Up?",
+    contexto:"",
+    opcoes:[
+      { letra:"A", texto:"Nunca tentei",                         pontos:2,  ind:{base:8},               insight:"Você está no ponto certo para começar com a progressão correta desde o início." },
+      { letra:"B", texto:"Tentei mas não cheguei nem perto",     pontos:4,  ind:{base:12, progressao:5},insight:"A forma como você está tentando pode estar completamente errada." },
+      { letra:"C", texto:"Chego perto mas não consigo completar",pontos:10, ind:{transicao:12, trajetoria:8}, insight:"Esse padrão tem um nome técnico — e uma solução específica." },
+      { letra:"D", texto:"Já fiz com elástico ou com ajuda",     pontos:12, ind:{transicao:8, explosao:6},insight:"Você já sente o movimento. Falta só destravar o padrão sem assistência." },
+    ]
+  },
+  {
+    id:"p6", modulo:"DIAGNÓSTICO",
+    texto:"Quando você tenta o Muscle Up, o que acontece?",
+    contexto:"Esse é o dado mais importante do seu diagnóstico.",
+    opcoes:[
+      { letra:"A", texto:"Não consigo nem subir — falta força",                    pontos:2,  ind:{base:22}           },
+      { letra:"B", texto:"Subo mas bato o peito na barra e trava",                 pontos:8,  ind:{trajetoria:22}     },
+      { letra:"C", texto:"Consigo subir mas não passo para cima da barra",         pontos:9,  ind:{transicao:22}     },
+      { letra:"D", texto:"Chego quase lá mas falta aquela explosão final",         pontos:10, ind:{explosao:22}      },
+    ]
+  },
+  {
+    id:"p7", modulo:"DIAGNÓSTICO",
+    texto:"Você treina barras explosivas? (barras com salto, chest-to-bar, high pull)",
+    contexto:"",
+    opcoes:[
+      { letra:"A", texto:"Nunca ouvi falar dessas variações",    pontos:2,  ind:{progressao:12, explosao:8}, insight:"Essa lacuna pode ser um dos seus maiores bloqueios." },
+      { letra:"B", texto:"Já ouvi mas nunca treinei",            pontos:4,  ind:{progressao:8, explosao:5},  insight:"Treinar barras tradicionais demais e explosivas de menos é o erro mais comum." },
+      { letra:"C", texto:"Treino às vezes, sem consistência",    pontos:7,  ind:{explosao:4}                },
+      { letra:"D", texto:"Treino regularmente com variações",    pontos:12, ind:{trajetoria:6}              },
+    ]
+  },
+  {
+    id:"p8", modulo:"DIAGNÓSTICO",
+    texto:"Como é a sua progressão de treino atualmente?",
+    contexto:"",
+    opcoes:[
+      { letra:"A", texto:"Não tenho progressão — treino o que quero",              pontos:2,  ind:{progressao:22},  insight:"Essa pode ser a raiz do bloqueio. Esforço sem direção gera estagnação." },
+      { letra:"B", texto:"Sigo vídeos do YouTube sem um plano fixo",               pontos:4,  ind:{progressao:14},  insight:"YouTube resolve dúvidas pontuais — mas raramente resolve o problema raiz." },
+      { letra:"C", texto:"Tenho um plano mas não foca no Muscle Up",               pontos:7,  ind:{progressao:7}    },
+      { letra:"D", texto:"Tenho progressão estruturada para Muscle Up",            pontos:12, ind:{}                },
+    ]
+  },
+  {
+    id:"p9", modulo:"DIAGNÓSTICO",
+    texto:"O que mais te impede de conquistar o Muscle Up hoje?",
+    contexto:"Escolha a alternativa com a qual você mais se identifica.",
+    opcoes:[
+      { letra:"A", texto:"Preciso ganhar mais força",                              pontos:4,  ind:{base:16}              },
+      { letra:"B", texto:"Não sei a técnica correta da transição",                 pontos:8,  ind:{transicao:14, trajetoria:8} },
+      { letra:"C", texto:"Falta velocidade e explosão no puxão",                   pontos:9,  ind:{explosao:18}           },
+      { letra:"D", texto:"Estou treinando mas não vejo evolução",                  pontos:10, ind:{progressao:18}         },
+    ]
+  },
+  {
+    id:"p10", modulo:"DIAGNÓSTICO",
+    texto:"Há quanto tempo você tenta aprender o Muscle Up?",
+    contexto:"",
+    opcoes:[
+      { letra:"A", texto:"Ainda não comecei a tentar",   pontos:2,  ind:{base:5}           },
+      { letra:"B", texto:"Há alguns meses",              pontos:6,  ind:{},                insight:"Meses tentando sem resultado é sinal claro de um bloqueio técnico específico." },
+      { letra:"C", texto:"Há mais de 6 meses",           pontos:10, ind:{progressao:8},    insight:"6 meses sem evolução confirma que o problema não é força — é método." },
+      { letra:"D", texto:"Há mais de 1 ano",             pontos:14, ind:{progressao:10},   insight:"Mais de 1 ano travado? Existe um erro técnico específico que você ainda não identificou." },
+    ]
+  },
+];
+
+/* ============================================================
+   PERFIS DE RESULTADO
+============================================================ */
+const PERFIS = {
+  explosao: {
+    badge: "⚡ PERFIL: FALTA DE EXPLOSÃO",
+    titulo: "Seu corpo consegue subir.\nMas não rápido o suficiente.",
+    copy: [
+      "Você provavelmente treina barras tradicionais demais e barras explosivas de menos.",
+      "Sem velocidade suficiente no puxão inicial, seu corpo nunca ganha altura suficiente para completar a transição.",
+      "O Muscle Up não é um exercício de força máxima. É um exercício de potência — força aplicada em velocidade.",
+    ],
+    destaque: "O treino correto não é fazer mais barras. É fazer barras mais rápidas, em variações específicas que desenvolvem a explosão necessária para o Muscle Up.",
+    ofertaConector: "Seu diagnóstico mostra que você já tem base de força — o que falta é aprender a aplicar essa força com velocidade. A progressão correta resolve isso em semanas.",
+  },
+  trajetoria: {
+    badge: "🎯 PERFIL: ERRO DE TRAJETÓRIA",
+    titulo: "Você está puxando para cima.\nMas o Muscle Up não acontece para cima.",
+    copy: [
+      "Ele acontece ao redor da barra.",
+      "Enquanto você continuar tentando fazer uma barra fixa muito forte e vertical, vai continuar batendo o peito na barra sem conseguir passar.",
+      "Esse é um dos erros mais comuns — e um dos mais fáceis de corrigir quando você aprende o ângulo exato.",
+    ],
+    destaque: "A trajetória do puxão no Muscle Up é diferente de uma barra convencional. Um único ajuste no ângulo de tração pode mudar tudo — e esse ajuste leva menos de uma sessão de treino para ser aprendido.",
+    ofertaConector: "Seu diagnóstico aponta para um erro de trajetória. Com a correção certa do ângulo de puxão, praticantes com seu perfil costumam destravar o Muscle Up rapidamente.",
+  },
+  transicao: {
+    badge: "🔓 PERFIL: TRANSIÇÃO BLOQUEADA",
+    titulo: "Seu problema não está na subida.\nEstá na passagem.",
+    copy: [
+      "Você consegue gerar força. Mas não consegue transformar essa força em posicionamento acima da barra.",
+      "É por isso que você sente que chega perto — mas nunca consegue finalizar.",
+      "A transição é a parte técnica mais complexa do Muscle Up. E ela precisa ser treinada de forma isolada antes de aparecer no movimento completo.",
+    ],
+    destaque: "Existem 3 progressões específicas que treinam exatamente esse momento de transição. A maioria das pessoas nunca pratica nenhuma delas — e por isso fica travada no mesmo ponto indefinidamente.",
+    ofertaConector: "Seu diagnóstico aponta para bloqueio de transição. É o mais frustrante dos 5 perfis — você está PRÓXIMO. Com as progressões certas, o movimento pode acontecer nas próximas semanas.",
+  },
+  progressao: {
+    badge: "📈 PERFIL: PROGRESSÃO ERRADA",
+    titulo: "Você está treinando muito.\nMas treinando etapas fora da ordem.",
+    copy: [
+      "Isso gera esforço. Mas não gera evolução.",
+      "O Muscle Up é um movimento com etapas muito específicas. Tentar o movimento completo sem dominar cada etapa separadamente é como tentar escrever uma redação sem conhecer as letras.",
+      "Você pode ter força suficiente. Mas está aplicando ela da maneira e na ordem errada.",
+    ],
+    destaque: "Uma progressão estruturada divide o Muscle Up em 5 fases. A maioria das pessoas pula direto para a tentativa do movimento completo — e fica presa no mesmo lugar por meses ou anos.",
+    ofertaConector: "Seu diagnóstico é claro: o problema não é força — é a ordem do treino. Com a progressão correta, alunos com exatamente esse perfil conquistaram o Muscle Up em até 28 dias.",
+  },
+  base: {
+    badge: "🏗️ PERFIL: BASE INCOMPLETA",
+    titulo: "Antes do Muscle Up existe uma fundação.\nE a sua ainda está sendo construída.",
+    copy: [
+      "Seu diagnóstico mostra que você ainda precisa desenvolver alguns elementos básicos antes de acelerar para o movimento completo.",
+      "Isso não é uma notícia ruim. Na verdade, é exatamente o oposto.",
+      "Quem começa construindo a fundação certa chega ao Muscle Up muito mais rápido do que quem tenta o atalho — e cria um padrão de movimento que dura para sempre.",
+    ],
+    destaque: "Com a progressão correta, alunos que começaram do zero chegaram ao primeiro Muscle Up em menos de 28 dias. A base certa acelera tudo — e você já está no caminho.",
+    ofertaConector: "Seu diagnóstico mostra que você está na fase ideal para começar a progressão correta. Quem começa do zero com o método certo evolui surpreendentemente rápido.",
+  },
+};
+
+/* ============================================================
+   STATE
+============================================================ */
+let STATE = {
+  telaAtual: "splash",
+  score: 0,
+  perguntaAtual: 0,
+  respostas: {},
+  nome: "",
+  whatsapp: "",
+  perfil: null,
+  multi: { explosao:0, trajetoria:0, transicao:0, progressao:0, base:0 },
+  tempoInicio: null,
+};
+
+/* ============================================================
+   HELPERS
+============================================================ */
+const $ = id => document.getElementById(id);
+
+function irParaTela(id) {
+  document.querySelectorAll(".tela").forEach(t => t.classList.remove("ativa"));
+  const t = $(`tela-${id}`);
+  if (t) { t.classList.add("ativa"); window.scrollTo(0,0); }
+  STATE.telaAtual = id;
+  $("barra-wrap").style.display = id === "quiz" ? "" : "none";
+}
+
+function atualizarBarra() {
+  const pct = Math.round((STATE.perguntaAtual / PERGUNTAS.length) * 100);
+  $("barra-fill").style.width = pct + "%";
+  $("barra-pct").textContent = pct + "%";
+  const fases = ["", "Escaneando perfil...", "Detectando padrões...", "Calculando bloqueio..."];
+  const faseIdx = Math.floor((STATE.perguntaAtual / PERGUNTAS.length) * 3);
+  $("barra-fase").textContent = fases[faseIdx] || "";
+}
+
+function mostrarInsight(txt) {
+  $("insight-wrap").innerHTML = `<div class="quiz-insight">💡 ${txt}</div>`;
+}
+function limparInsight() { $("insight-wrap").innerHTML = ""; }
+
+/* ============================================================
+   QUIZ
+============================================================ */
+function renderizarPergunta() {
+  const idx = STATE.perguntaAtual;
+  const p = PERGUNTAS[idx];
+
+  if (!p) { irParaTela("processando"); iniciarProcessamento(); return; }
+
+  limparInsight();
+  $("quiz-modulo").textContent = p.modulo || "";
+  $("quiz-numero").textContent = `PERGUNTA ${idx+1} DE ${PERGUNTAS.length}`;
+  $("quiz-pergunta").textContent = p.texto;
+
+  const ctx = $("quiz-contexto");
+  if (p.contexto) { ctx.textContent = p.contexto; ctx.style.display = ""; }
+  else ctx.style.display = "none";
+
+  const container = $("opcoes-container");
+  container.innerHTML = "";
+  const ant = STATE.respostas[p.id];
+
+  p.opcoes.forEach((op, i) => {
+    const btn = document.createElement("button");
+    btn.className = "opcao-btn" + (ant && ant.opcaoIndex === i ? " selecionada" : "");
+    btn.innerHTML = `<span class="opcao-letra">${op.letra}</span><span class="opcao-texto">${op.texto}</span>`;
+    btn.addEventListener("click", () => selecionarOpcao(p, i, op));
+    container.appendChild(btn);
+  });
+
+  atualizarBarra();
+}
+
+function selecionarOpcao(pergunta, idx, opcao) {
+  const ant = STATE.respostas[pergunta.id];
+
+  if (ant) {
+    STATE.score -= ant.pontos;
+    const opAnt = pergunta.opcoes[ant.opcaoIndex];
+    if (opAnt?.ind) Object.entries(opAnt.ind).forEach(([k,v]) => { if (STATE.multi[k]!==undefined) STATE.multi[k]-=v; });
+  }
+
+  STATE.score = Math.max(0, STATE.score + opcao.pontos);
+  if (opcao.ind) Object.entries(opcao.ind).forEach(([k,v]) => { if (STATE.multi[k]!==undefined) STATE.multi[k]+=v; });
+  STATE.respostas[pergunta.id] = { opcaoIndex:idx, pontos:opcao.pontos, texto:opcao.texto };
+
+  document.querySelectorAll(".opcao-btn").forEach(b => b.classList.remove("selecionada"));
+  document.querySelectorAll(".opcao-btn")[idx]?.classList.add("selecionada");
+
+  if (opcao.insight) mostrarInsight(opcao.insight);
+
+  setTimeout(() => { STATE.perguntaAtual++; renderizarPergunta(); }, opcao.insight ? 950 : 450);
+}
+
+/* ============================================================
+   PROCESSAMENTO
+============================================================ */
+function iniciarProcessamento() {
+  STATE.perfil = identificarPerfil();
+  renderizarResultado();
+  renderizarOferta();
+
+  const scanData = [
+    { label:"Força de puxada", val: STATE.respostas["p3"]?.texto || "—" },
+    { label:"Experiência no Muscle Up", val: STATE.respostas["p5"]?.texto || "—" },
+    { label:"Bloqueio identificado", val: STATE.respostas["p6"]?.texto || "—" },
+    { label:"Perfil de progressão", val: STATE.respostas["p8"]?.texto || "—" },
+  ];
+
+  const scanEl = $("proc-scan");
+  scanEl.innerHTML = "";
+  scanData.forEach(item => {
+    const el = document.createElement("div");
+    el.className = "proc-scan-item";
+    el.innerHTML = `<span class="ck">✓</span><span><strong>${item.label}:</strong> ${item.val}</span>`;
+    scanEl.appendChild(el);
+  });
+
+  const etapas = [
+    "Analisando força de puxada...",
+    "Mapeando padrão de movimento...",
+    "Identificando o erro principal...",
+    "Diagnóstico concluído. ✓",
+  ];
+
+  const STEP = 400;
+  etapas.forEach((e, i) => {
+    setTimeout(() => {
+      $("proc-etapa").textContent = e;
+      $("proc-bar").style.width = Math.round(((i+1)/etapas.length)*100) + "%";
+      if (scanEl.children[i]) scanEl.children[i].classList.add("vis");
+    }, i * STEP);
+  });
+
+  setTimeout(() => irParaTela("captura"), etapas.length * STEP + 300);
+}
+
+function identificarPerfil() {
+  const m = STATE.multi;
+  return Object.entries(m).sort((a,b) => b[1]-a[1])[0][0];
+}
+
+/* ============================================================
+   CAPTURA
+============================================================ */
+$("btn-cap").addEventListener("click", () => {
+  const nome = $("campo-nome").value.trim();
+  const zap  = $("campo-whatsapp").value.trim();
+  if (!nome) { $("campo-nome").focus(); return; }
+  if (!zap)  { $("campo-whatsapp").focus(); return; }
+  STATE.nome = nome;
+  STATE.whatsapp = zap;
+  irParaTela("resultado");
+});
+
+/* ============================================================
+   RESULTADO
+============================================================ */
+function renderizarResultado() {
+  const p = PERFIS[STATE.perfil] || PERFIS.progressao;
+  const titulo = p.titulo.replace("\n", "<br>");
+
+  $("res-conteudo").innerHTML = `
+    <div class="res-badge">${p.badge}</div>
+    <h2 class="res-titulo">${titulo}</h2>
+    <div class="res-copy">
+      ${p.copy.map(c=>`<p>${c}</p>`).join("")}
+    </div>
+    <div class="res-box">
+      <p class="res-box-label">🔥 A descoberta mais importante:</p>
+      <p class="res-box-texto">${p.destaque}</p>
+    </div>
+    <div class="res-aha">
+      <p class="res-aha-label">O Momento AHA que muda tudo:</p>
+      <p class="res-aha-texto">
+        <strong>Seu problema provavelmente não é força.</strong><br><br>
+        Seu problema é que você está tentando resolver o Muscle Up como se ele fosse um exercício de força.<br><br>
+        Quando na verdade ele é um exercício de <strong>potência + técnica + transição</strong>.<br><br>
+        E essa é exatamente a razão pela qual pessoas mais fracas que você conseguem fazer Muscle Up enquanto você continua travado.
+      </p>
+    </div>
+    <p class="res-ponte">
+      94% das pessoas que ficam travadas no mesmo ponto por meses não param por falta de força — param porque estão tentando resolver um problema técnico com mais volume de treino.
+    </p>
+    <button class="res-cta" onclick="irParaTela('oferta')">Ver o Caminho Mais Rápido Agora →</button>
+    <p class="res-cta-sub">Disponível imediatamente após o próximo passo</p>
+  `;
+}
+
+/* ============================================================
+   OFERTA
+============================================================ */
+function renderizarOferta() {
+  const p = PERFIS[STATE.perfil] || PERFIS.progressao;
+  const nome = STATE.nome ? STATE.nome.split(" ")[0] : "você";
+
+  $("oferta-conteudo").innerHTML = `
+    <div class="oferta-urgencia">⚡ Oferta de Lançamento — Condição especial por tempo limitado</div>
+    <h2 class="oferta-titulo">
+      ${nome}, ${p.ofertaConector}
+    </h2>
+    <p class="oferta-sub">
+      Centenas de praticantes ficam meses ou anos tentando aprender Muscle Up porque treinam sem uma progressão estruturada.<br><br>
+      O <strong style="color:var(--cor-texto)">Método Muscle Up em 28 Dias</strong> é o sistema de correção dos 5 erros que impedem o primeiro Muscle Up.
+    </p>
+    <div class="oferta-itens">
+      <div class="oferta-item"><span class="oferta-check">✓</span><span>Progressão completa em 5 fases — da base ao Muscle Up completo</span></div>
+      <div class="oferta-item"><span class="oferta-check">✓</span><span>Correção específica para o seu perfil: <strong>${p.badge}</strong></span></div>
+      <div class="oferta-item"><span class="oferta-check">✓</span><span>Exercícios explosivos e de transição que 90% dos praticantes nunca treinam</span></div>
+      <div class="oferta-item"><span class="oferta-check">✓</span><span>Acesso imediato — comece hoje mesmo</span></div>
+      <div class="oferta-item"><span class="oferta-check">✓</span><span>Método validado por alunos que conquistaram o Muscle Up em até 28 dias</span></div>
+    </div>
+    <div class="preco-box">
+      <p class="preco-de">De R$ 87,90</p>
+      <p class="preco-por">R$ 19,90</p>
+      <p class="preco-label">Oferta de lançamento</p>
+      <p class="preco-dia">menos de R$ 0,71 por dia</p>
+    </div>
+    <button class="btn-oferta" id="btn-comprar">Quero Corrigir Meu Erro e Conquistar Meu Muscle Up →</button>
+    <div class="oferta-garantia">
+      <span class="garantia-icon">🛡️</span>
+      <span>Garantia de 7 dias. Se você não tiver avançado na progressão, devolvemos 100% do valor — sem perguntas.</span>
+    </div>
+    <p class="oferta-prova">Baseado em +500 alunos que já seguiram este método • Resultado em até 28 dias</p>
+  `;
+
+  setTimeout(() => {
+    const btn = $("btn-comprar");
+    if (btn) btn.addEventListener("click", () => {
+      // window.location.href = "URL_DO_PRODUTO";
+      alert("Redirecionar para página de pagamento");
+    });
+  }, 100);
+}
+
+/* ============================================================
+   INICIAR
+============================================================ */
+$("btn-iniciar").addEventListener("click", () => {
+  STATE = {
+    telaAtual:"quiz", score:0, perguntaAtual:0,
+    respostas:{}, nome:"", whatsapp:"", perfil:null,
+    multi:{ explosao:0, trajetoria:0, transicao:0, progressao:0, base:0 },
+    tempoInicio: Date.now(),
+  };
+  irParaTela("quiz");
+  renderizarPergunta();
+});
+
+/* ============================================================
+   PARTÍCULAS
+============================================================ */
+(function(){
+  const c = $("canvas-p"), ctx = c.getContext("2d");
+  function rs(){ c.width=window.innerWidth; c.height=window.innerHeight; }
+  rs(); window.addEventListener("resize",rs);
+  let ps=[];
+  function np(){ return {x:Math.random()*c.width, y:Math.random()*c.height, r:Math.random()*1.5+.3, dx:(Math.random()-.5)*.3, dy:-Math.random()*.4-.1, a:Math.random()*.3+.05}; }
+  for(let i=0;i<50;i++) ps.push(np());
+  function anim(){
+    ctx.clearRect(0,0,c.width,c.height);
+    ps.forEach((p,i)=>{
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,255,135,${p.a})`; ctx.fill();
+      p.x+=p.dx; p.y+=p.dy;
+      if(p.y<-5||p.x<-5||p.x>c.width+5){ ps[i]=np(); ps[i].y=c.height+5; }
+    });
+    requestAnimationFrame(anim);
+  }
+  anim();
+})();
+</script>
+</body>
+</html>
