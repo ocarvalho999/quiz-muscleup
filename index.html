@@ -644,6 +644,7 @@ $("btn-cap").addEventListener("click", () => {
   if (!zap)  { $("campo-whatsapp").focus(); return; }
   STATE.nome = nome;
   STATE.whatsapp = zap;
+  renderizarOferta();
   enviarLeadParaPlanilha();
   irParaTela("resultado");
 });
