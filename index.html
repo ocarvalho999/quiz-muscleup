@@ -824,8 +824,10 @@ function renderizarOferta() {
     const btn = $("btn-comprar");
     if (btn) btn.addEventListener("click", () => {
       trackMeta("InitiateCheckout", { value: 19.90, currency: "BRL" });
-      // Query string de atribuição pronta pra anexar na URL do checkout
-      // assim que a plataforma for definida — sem nome/telefone nela.
+      // GGCheckout confirma suporte a utm_source/medium/campaign/content/term
+      // na URL, ecoados de volta no webhook. tracking_id e fbclid vão junto
+      // por garantia, mas a correspondência do pagamento com o lead usa o
+      // WhatsApp (o GGCheckout não confirma eco de parâmetros não-UTM).
       const qs = new URLSearchParams({
         tracking_id: TRACKING_ID,
         utm_source: ATRIBUICAO.utm_source,
@@ -835,8 +837,7 @@ function renderizarOferta() {
         utm_term: ATRIBUICAO.utm_term,
         fbclid: ATRIBUICAO.fbclid,
       });
-      // window.location.href = "URL_DO_CHECKOUT?" + qs.toString();
-      alert("Redirecionar para página de pagamento");
+      window.location.href = "https://ggcheckout.app/checkout/v3/PGZpRilk7mGpwdVcbOtM?" + qs.toString();
     });
   }, 100);
 }
