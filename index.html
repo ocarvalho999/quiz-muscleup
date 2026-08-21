@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Diagnóstico Muscle Up — Descubra qual erro está bloqueando seu primeiro Muscle Up</title>
+  <title>Diagnóstico Muscle Up em 14 Dias — Descubra o que está travando seu primeiro Muscle Up</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
@@ -254,7 +254,7 @@
 <!-- SPLASH -->
 <section class="tela ativa" id="tela-splash">
   <div class="splash-content">
-    <div class="splash-badge"><span class="badge-dot"></span>Diagnóstico Gratuito de Muscle Up</div>
+    <div class="splash-badge"><span class="badge-dot"></span>Desafio Muscle Up em 14 Dias</div>
     <h1 class="splash-headline">
       🚨 Você está cometendo um dos <em>5 erros</em> que impedem 87% dos praticantes de fazer o primeiro Muscle Up?
     </h1>
@@ -262,11 +262,11 @@
       A maioria acredita que precisa ficar mais forte.<br>
       Mas os melhores treinadores de calistenia concordam:<br><br>
       <strong>O verdadeiro problema costuma ser técnica, explosão ou progressão.</strong><br><br>
-      Faça o diagnóstico e descubra o que realmente está travando o seu Muscle Up.
+      Faça o diagnóstico rápido e descubra exatamente o que está travando o seu Muscle Up — e como corrigir isso em até 14 dias de treino.
     </p>
     <div class="splash-proof">
       <div class="splash-proof-item">🔥 <span>+1.200 diagnósticos realizados</span></div>
-      <div class="splash-proof-item">⏱ <span>Menos de 60 segundos</span></div>
+      <div class="splash-proof-item">⏱ <span>Menos de 30 segundos</span></div>
     </div>
   </div>
   <div class="splash-cta-area">
@@ -300,9 +300,9 @@
 <!-- CAPTURA -->
 <section class="tela" id="tela-captura">
   <div class="cap-header">
-    <div class="cap-icon">🎯</div>
-    <h2 class="cap-titulo">Seu diagnóstico está pronto.</h2>
-    <p class="cap-sub">Para onde enviamos sua análise completa?</p>
+    <div class="cap-icon">💬</div>
+    <h2 class="cap-titulo">Sua vaga na comunidade está reservada.</h2>
+    <p class="cap-sub">É pelo WhatsApp que você entra pro grupo e recebe seu diagnóstico completo.</p>
   </div>
   <div class="campos">
     <div>
@@ -313,8 +313,8 @@
       <p class="campo-label">Seu WhatsApp</p>
       <input class="campo-input" type="tel" id="campo-whatsapp" placeholder="(00) 00000-0000" autocomplete="tel">
     </div>
-    <button class="btn-cap" id="btn-cap">Ver Meu Diagnóstico Muscle Up →</button>
-    <p class="cap-privacidade">🔒 Seu número é usado apenas para enviar sua análise. Sem spam.</p>
+    <button class="btn-cap" id="btn-cap">Entrar na Comunidade e Ver Meu Diagnóstico →</button>
+    <p class="cap-privacidade">🔒 Seu número é usado só pra te adicionar na comunidade e enviar sua análise. Sem spam.</p>
   </div>
 </section>
 
@@ -332,115 +332,54 @@
 /* ============================================================
    PERGUNTAS
 ============================================================ */
+// Reduzido de 10 pra 4 perguntas — só as mais decisivas pra identificar o
+// perfil (cada uma já tem peso alto o suficiente pra diferenciar sozinha).
+// Cortadas as perguntas "de contexto" (tempo de treino, dias por semana,
+// flexões) que só engordavam o score de "base" sem ajudar a diferenciar
+// entre os 5 perfis.
 const PERGUNTAS = [
   {
     id:"p1", modulo:"DIAGNÓSTICO",
-    texto:"Há quanto tempo você treina calistenia ou musculação?",
-    contexto:"Sua base de treino é o ponto de partida do diagnóstico.",
+    texto:"Quantas barras fixas você consegue fazer sem parar?",
+    contexto:"Seja honesto — esse dado é fundamental para o diagnóstico.",
     opcoes:[
-      { letra:"A", texto:"Menos de 3 meses",   pontos:2,  ind:{base:15},          insight:"Todo começo tem seu desafio. Vamos descobrir exatamente onde você está." },
-      { letra:"B", texto:"3 a 6 meses",         pontos:4,  ind:{base:8},           insight:"Você já tem uma base. Agora é hora de afinar o que está travando." },
-      { letra:"C", texto:"6 meses a 2 anos",    pontos:8,  ind:{progressao:5},     insight:"Com esse tempo de treino, a resposta pode te surpreender." },
-      { letra:"D", texto:"Mais de 2 anos",      pontos:12, ind:{trajetoria:5},     insight:"Experiência tem. Então o problema é muito mais sutil do que parece." },
+      { letra:"A", texto:"Nenhuma ainda",        pontos:2,  ind:{base:20},                   insight:"Sem problema — muita gente chega ao Muscle Up partindo exatamente daqui." },
+      { letra:"B", texto:"1 a 4 repetições",     pontos:5,  ind:{base:12},                   insight:"Sua base já está em construção. Falta pouco pra destravar." },
+      { letra:"C", texto:"5 a 8 repetições",     pontos:10, ind:{explosao:10, transicao:6}   },
+      { letra:"D", texto:"9 ou mais repetições", pontos:14, ind:{trajetoria:8, explosao:8},  insight:"Com essa força, o problema definitivamente não é falta de puxada." },
     ]
   },
   {
     id:"p2", modulo:"DIAGNÓSTICO",
-    texto:"Quantos dias por semana você treina?",
-    contexto:"",
+    texto:"Quando você tenta o Muscle Up, o que acontece?",
+    contexto:"Esse é o dado mais importante do seu diagnóstico.",
     opcoes:[
-      { letra:"A", texto:"1 a 2 dias",          pontos:2,  ind:{base:8}            },
-      { letra:"B", texto:"3 dias",              pontos:7,  ind:{}                  },
-      { letra:"C", texto:"4 a 5 dias",          pontos:10, ind:{}                  },
-      { letra:"D", texto:"6 ou 7 dias",         pontos:6,  ind:{progressao:6},     insight:"Atenção — treinar demais sem uma progressão pode ser um dos seus bloqueios." },
+      { letra:"A", texto:"Nunca tentei ou não chego nem perto",             pontos:2,  ind:{base:22},      insight:"Você está no ponto certo pra começar com a progressão correta desde o início." },
+      { letra:"B", texto:"Subo mas bato o peito na barra e travo",          pontos:8,  ind:{trajetoria:22},insight:"Esse travamento tem uma causa técnica bem específica — e uma correção rápida." },
+      { letra:"C", texto:"Consigo subir mas não passo pra cima da barra",   pontos:9,  ind:{transicao:22}, insight:"Você está mais perto do que imagina. Falta só destravar essa passagem." },
+      { letra:"D", texto:"Chego quase lá mas falta aquela explosão final",  pontos:10, ind:{explosao:22},  insight:"Isso não é falta de força — é falta de velocidade no puxão certo." },
     ]
   },
   {
     id:"p3", modulo:"DIAGNÓSTICO",
-    texto:"Quantas barras você consegue fazer sem parar?",
-    contexto:"Seja honesto — esse dado é fundamental para o diagnóstico.",
+    texto:"Como é a sua progressão de treino hoje?",
+    contexto:"",
     opcoes:[
-      { letra:"A", texto:"Nenhuma ainda",        pontos:1,  ind:{base:22},          insight:"Sem problema — muitas pessoas chegam ao Muscle Up partindo desse ponto." },
-      { letra:"B", texto:"1 a 4 repetições",     pontos:4,  ind:{base:15},          insight:"Sua base está em construção. Mas já dá para mapear o caminho exato." },
-      { letra:"C", texto:"5 a 8 repetições",     pontos:9,  ind:{explosao:8},       insight:"Com esse nível de força, você provavelmente já está pronto. O que falta é outra coisa." },
-      { letra:"D", texto:"9 ou mais repetições", pontos:14, ind:{trajetoria:10, transicao:8}, insight:"Com 9+ barras, força definitivamente não é seu problema. O erro está em outro lugar." },
+      { letra:"A", texto:"Não tenho progressão — treino o que dá",         pontos:2,  ind:{progressao:20}, insight:"Essa costuma ser a raiz do bloqueio — esforço sem direção gera estagnação." },
+      { letra:"B", texto:"Sigo vídeos soltos, sem plano fixo",             pontos:5,  ind:{progressao:14} },
+      { letra:"C", texto:"Tenho um plano mas não é focado no Muscle Up",   pontos:8,  ind:{progressao:8}  },
+      { letra:"D", texto:"Tenho progressão estruturada pro Muscle Up",     pontos:12, ind:{}               },
     ]
   },
   {
     id:"p4", modulo:"DIAGNÓSTICO",
-    texto:"Quantas flexões você faz sem parar?",
+    texto:"Há quanto tempo você tenta conquistar o Muscle Up?",
     contexto:"",
     opcoes:[
-      { letra:"A", texto:"Menos de 10",          pontos:2,  ind:{base:12}           },
-      { letra:"B", texto:"10 a 20",              pontos:5,  ind:{base:5}            },
-      { letra:"C", texto:"21 a 30",              pontos:9,  ind:{}                  },
-      { letra:"D", texto:"Mais de 30",           pontos:12, ind:{trajetoria:5},     insight:"Boa resistência de empurrar. Isso confirma que o bloqueio está na técnica." },
-    ]
-  },
-  {
-    id:"p5", modulo:"DIAGNÓSTICO",
-    texto:"Você já tentou fazer um Muscle Up?",
-    contexto:"",
-    opcoes:[
-      { letra:"A", texto:"Nunca tentei",                         pontos:2,  ind:{base:8},               insight:"Você está no ponto certo para começar com a progressão correta desde o início." },
-      { letra:"B", texto:"Tentei mas não cheguei nem perto",     pontos:4,  ind:{base:12, progressao:5},insight:"A forma como você está tentando pode estar completamente errada." },
-      { letra:"C", texto:"Chego perto mas não consigo completar",pontos:10, ind:{transicao:12, trajetoria:8}, insight:"Esse padrão tem um nome técnico — e uma solução específica." },
-      { letra:"D", texto:"Já fiz com elástico ou com ajuda",     pontos:12, ind:{transicao:8, explosao:6},insight:"Você já sente o movimento. Falta só destravar o padrão sem assistência." },
-    ]
-  },
-  {
-    id:"p6", modulo:"DIAGNÓSTICO",
-    texto:"Quando você tenta o Muscle Up, o que acontece?",
-    contexto:"Esse é o dado mais importante do seu diagnóstico.",
-    opcoes:[
-      { letra:"A", texto:"Não consigo nem subir — falta força",                    pontos:2,  ind:{base:22}           },
-      { letra:"B", texto:"Subo mas bato o peito na barra e trava",                 pontos:8,  ind:{trajetoria:22}     },
-      { letra:"C", texto:"Consigo subir mas não passo para cima da barra",         pontos:9,  ind:{transicao:22}     },
-      { letra:"D", texto:"Chego quase lá mas falta aquela explosão final",         pontos:10, ind:{explosao:22}      },
-    ]
-  },
-  {
-    id:"p7", modulo:"DIAGNÓSTICO",
-    texto:"Você treina barras explosivas? (barras com salto, chest-to-bar, high pull)",
-    contexto:"",
-    opcoes:[
-      { letra:"A", texto:"Nunca ouvi falar dessas variações",    pontos:2,  ind:{progressao:12, explosao:8}, insight:"Essa lacuna pode ser um dos seus maiores bloqueios." },
-      { letra:"B", texto:"Já ouvi mas nunca treinei",            pontos:4,  ind:{progressao:8, explosao:5},  insight:"Treinar barras tradicionais demais e explosivas de menos é o erro mais comum." },
-      { letra:"C", texto:"Treino às vezes, sem consistência",    pontos:7,  ind:{explosao:4}                },
-      { letra:"D", texto:"Treino regularmente com variações",    pontos:12, ind:{trajetoria:6}              },
-    ]
-  },
-  {
-    id:"p8", modulo:"DIAGNÓSTICO",
-    texto:"Como é a sua progressão de treino atualmente?",
-    contexto:"",
-    opcoes:[
-      { letra:"A", texto:"Não tenho progressão — treino o que quero",              pontos:2,  ind:{progressao:22},  insight:"Essa pode ser a raiz do bloqueio. Esforço sem direção gera estagnação." },
-      { letra:"B", texto:"Sigo vídeos do YouTube sem um plano fixo",               pontos:4,  ind:{progressao:14},  insight:"YouTube resolve dúvidas pontuais — mas raramente resolve o problema raiz." },
-      { letra:"C", texto:"Tenho um plano mas não foca no Muscle Up",               pontos:7,  ind:{progressao:7}    },
-      { letra:"D", texto:"Tenho progressão estruturada para Muscle Up",            pontos:12, ind:{}                },
-    ]
-  },
-  {
-    id:"p9", modulo:"DIAGNÓSTICO",
-    texto:"O que mais te impede de conquistar o Muscle Up hoje?",
-    contexto:"Escolha a alternativa com a qual você mais se identifica.",
-    opcoes:[
-      { letra:"A", texto:"Preciso ganhar mais força",                              pontos:4,  ind:{base:16}              },
-      { letra:"B", texto:"Não sei a técnica correta da transição",                 pontos:8,  ind:{transicao:14, trajetoria:8} },
-      { letra:"C", texto:"Falta velocidade e explosão no puxão",                   pontos:9,  ind:{explosao:18}           },
-      { letra:"D", texto:"Estou treinando mas não vejo evolução",                  pontos:10, ind:{progressao:18}         },
-    ]
-  },
-  {
-    id:"p10", modulo:"DIAGNÓSTICO",
-    texto:"Há quanto tempo você tenta aprender o Muscle Up?",
-    contexto:"",
-    opcoes:[
-      { letra:"A", texto:"Ainda não comecei a tentar",   pontos:2,  ind:{base:5}           },
-      { letra:"B", texto:"Há alguns meses",              pontos:6,  ind:{},                insight:"Meses tentando sem resultado é sinal claro de um bloqueio técnico específico." },
-      { letra:"C", texto:"Há mais de 6 meses",           pontos:10, ind:{progressao:8},    insight:"6 meses sem evolução confirma que o problema não é força — é método." },
-      { letra:"D", texto:"Há mais de 1 ano",             pontos:14, ind:{progressao:10},   insight:"Mais de 1 ano travado? Existe um erro técnico específico que você ainda não identificou." },
+      { letra:"A", texto:"Ainda não comecei a tentar",  pontos:2,  ind:{base:8}            },
+      { letra:"B", texto:"Há alguns meses",             pontos:6,  ind:{progressao:6},      insight:"Meses tentando sem resultado é sinal de bloqueio técnico específico." },
+      { letra:"C", texto:"Há mais de 6 meses",          pontos:10, ind:{progressao:10},     insight:"Esse tempo sem evolução confirma: o problema não é força, é método." },
+      { letra:"D", texto:"Há mais de 1 ano",            pontos:14, ind:{progressao:12},     insight:"Mais de 1 ano travado? Existe um erro técnico específico ainda não identificado." },
     ]
   },
 ];
@@ -458,7 +397,7 @@ const PERFIS = {
       "O Muscle Up não é um exercício de força máxima. É um exercício de potência — força aplicada em velocidade.",
     ],
     destaque: "O treino correto não é fazer mais barras. É fazer barras mais rápidas, em variações específicas que desenvolvem a explosão necessária para o Muscle Up.",
-    ofertaConector: "Seu diagnóstico mostra que você já tem base de força — o que falta é aprender a aplicar essa força com velocidade. A progressão correta resolve isso em semanas.",
+    ofertaConector: "Seu diagnóstico mostra que você já tem base de força — o que falta é aprender a aplicar essa força com velocidade. A progressão correta resolve isso em até 14 dias.",
   },
   trajetoria: {
     badge: "🎯 PERFIL: ERRO DE TRAJETÓRIA",
@@ -469,7 +408,7 @@ const PERFIS = {
       "Esse é um dos erros mais comuns — e um dos mais fáceis de corrigir quando você aprende o ângulo exato.",
     ],
     destaque: "A trajetória do puxão no Muscle Up é diferente de uma barra convencional. Um único ajuste no ângulo de tração pode mudar tudo — e esse ajuste leva menos de uma sessão de treino para ser aprendido.",
-    ofertaConector: "Seu diagnóstico aponta para um erro de trajetória. Com a correção certa do ângulo de puxão, praticantes com seu perfil costumam destravar o Muscle Up rapidamente.",
+    ofertaConector: "Seu diagnóstico aponta para um erro de trajetória. Com a correção certa do ângulo de puxão, praticantes com seu perfil costumam destravar o Muscle Up em até 14 dias.",
   },
   transicao: {
     badge: "🔓 PERFIL: TRANSIÇÃO BLOQUEADA",
@@ -480,7 +419,7 @@ const PERFIS = {
       "A transição é a parte técnica mais complexa do Muscle Up. E ela precisa ser treinada de forma isolada antes de aparecer no movimento completo.",
     ],
     destaque: "Existem 3 progressões específicas que treinam exatamente esse momento de transição. A maioria das pessoas nunca pratica nenhuma delas — e por isso fica travada no mesmo ponto indefinidamente.",
-    ofertaConector: "Seu diagnóstico aponta para bloqueio de transição. É o mais frustrante dos 5 perfis — você está PRÓXIMO. Com as progressões certas, o movimento pode acontecer nas próximas semanas.",
+    ofertaConector: "Seu diagnóstico aponta para bloqueio de transição. É o mais frustrante dos 5 perfis — você está PRÓXIMO. Com as progressões certas, o movimento pode acontecer em até 14 dias.",
   },
   progressao: {
     badge: "📈 PERFIL: PROGRESSÃO ERRADA",
@@ -491,7 +430,7 @@ const PERFIS = {
       "Você pode ter força suficiente. Mas está aplicando ela da maneira e na ordem errada.",
     ],
     destaque: "Uma progressão estruturada divide o Muscle Up em 5 fases. A maioria das pessoas pula direto para a tentativa do movimento completo — e fica presa no mesmo lugar por meses ou anos.",
-    ofertaConector: "Seu diagnóstico é claro: o problema não é força — é a ordem do treino. Com a progressão correta, alunos com exatamente esse perfil conquistaram o Muscle Up em até 28 dias.",
+    ofertaConector: "Seu diagnóstico é claro: o problema não é força — é a ordem do treino. Com a progressão correta, alunos com exatamente esse perfil conquistam o Muscle Up em menos de 2 meses — os mais dedicados, em até 14 dias.",
   },
   base: {
     badge: "🏗️ PERFIL: BASE INCOMPLETA",
@@ -501,7 +440,7 @@ const PERFIS = {
       "Isso não é uma notícia ruim. Na verdade, é exatamente o oposto.",
       "Quem começa construindo a fundação certa chega ao Muscle Up muito mais rápido do que quem tenta o atalho — e cria um padrão de movimento que dura para sempre.",
     ],
-    destaque: "Com a progressão correta, alunos que começaram do zero chegaram ao primeiro Muscle Up em menos de 28 dias. A base certa acelera tudo — e você já está no caminho.",
+    destaque: "Com a progressão correta, alunos que começaram do zero chegaram ao primeiro Muscle Up em menos de 2 meses — os mais dedicados, em até 14 dias. A base certa acelera tudo, e você já está no caminho.",
     ofertaConector: "Seu diagnóstico mostra que você está na fase ideal para começar a progressão correta. Quem começa do zero com o método certo evolui surpreendentemente rápido.",
   },
 };
@@ -611,10 +550,10 @@ function iniciarProcessamento() {
   renderizarOferta();
 
   const scanData = [
-    { label:"Força de puxada", val: STATE.respostas["p3"]?.texto || "—" },
-    { label:"Experiência no Muscle Up", val: STATE.respostas["p5"]?.texto || "—" },
-    { label:"Bloqueio identificado", val: STATE.respostas["p6"]?.texto || "—" },
-    { label:"Perfil de progressão", val: STATE.respostas["p8"]?.texto || "—" },
+    { label:"Força de puxada", val: STATE.respostas["p1"]?.texto || "—" },
+    { label:"Bloqueio identificado", val: STATE.respostas["p2"]?.texto || "—" },
+    { label:"Estrutura de treino", val: STATE.respostas["p3"]?.texto || "—" },
+    { label:"Tempo tentando", val: STATE.respostas["p4"]?.texto || "—" },
   ];
 
   const scanEl = $("proc-scan");
@@ -711,14 +650,14 @@ function renderizarOferta() {
     </h2>
     <p class="oferta-sub">
       Centenas de praticantes ficam meses ou anos tentando aprender Muscle Up porque treinam sem uma progressão estruturada.<br><br>
-      O <strong style="color:var(--cor-texto)">Método Muscle Up em 28 Dias</strong> é o sistema de correção dos 5 erros que impedem o primeiro Muscle Up.
+      O <strong style="color:var(--cor-texto)">Desafio Muscle Up em 14 Dias</strong> é o sistema de correção dos 5 erros que impedem o primeiro Muscle Up.
     </p>
     <div class="oferta-itens">
       <div class="oferta-item"><span class="oferta-check">✓</span><span>Progressão completa em 5 fases — da base ao Muscle Up completo</span></div>
       <div class="oferta-item"><span class="oferta-check">✓</span><span>Correção específica para o seu perfil: <strong>${p.badge}</strong></span></div>
+      <div class="oferta-item"><span class="oferta-check">✓</span><span>Acesso à comunidade no WhatsApp — acompanhamento e resposta de dúvidas todos os dias</span></div>
       <div class="oferta-item"><span class="oferta-check">✓</span><span>Exercícios explosivos e de transição que 90% dos praticantes nunca treinam</span></div>
       <div class="oferta-item"><span class="oferta-check">✓</span><span>Acesso imediato — comece hoje mesmo</span></div>
-      <div class="oferta-item"><span class="oferta-check">✓</span><span>Método validado por alunos que conquistaram o Muscle Up em até 28 dias</span></div>
     </div>
     <div class="preco-box">
       <p class="preco-de">De R$ 87,90</p>
@@ -726,12 +665,12 @@ function renderizarOferta() {
       <p class="preco-label">Oferta de lançamento</p>
       <p class="preco-dia">menos de R$ 0,71 por dia</p>
     </div>
-    <button class="btn-oferta" id="btn-comprar">Quero Corrigir Meu Erro e Conquistar Meu Muscle Up →</button>
+    <button class="btn-oferta" id="btn-comprar">Quero Entrar no Desafio de 14 Dias →</button>
     <div class="oferta-garantia">
       <span class="garantia-icon">🛡️</span>
       <span>Garantia de 7 dias. Se você não tiver avançado na progressão, devolvemos 100% do valor — sem perguntas.</span>
     </div>
-    <p class="oferta-prova">Baseado em +500 alunos que já seguiram este método • Resultado em até 28 dias</p>
+    <p class="oferta-prova">Baseado em +500 alunos • A maioria conquista o Muscle Up em até 2 meses, os mais dedicados em até 14 dias</p>
   `;
 
   setTimeout(() => {
