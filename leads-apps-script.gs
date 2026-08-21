@@ -1,7 +1,7 @@
 /**
- * Recebe os leads do quiz (nome, WhatsApp, respostas, perfil) e grava
- * em tempo real numa aba da planilha, com status de pagamento manual
- * para você acompanhar quem não gerou/pagou o Pix.
+ * Recebe os leads do quiz (nome, WhatsApp, respostas, perfil, atribuição
+ * de campanha) e grava em tempo real numa aba da planilha, com status de
+ * pagamento manual para você acompanhar quem não gerou/pagou o Pix.
  *
  * SETUP:
  * 1. Crie uma planilha nova no Google Sheets.
@@ -12,13 +12,19 @@
  * 4. Autorize as permissões pedidas (é sua própria planilha).
  * 5. Copie a URL do App da Web gerada (termina em /exec) e me envie —
  *    eu colo ela na constante LEADS_WEBHOOK_URL do quiz.
+ *
+ * Se você já tinha uma versão anterior deste script publicada: só colar
+ * este arquivo por cima e gerar uma "Nova versão" no mesmo deploy já
+ * basta — o cabeçalho da planilha é atualizado automaticamente na
+ * primeira gravação depois disso, sem apagar linhas existentes.
  */
 
 const SHEET_NAME = "Leads";
 const HEADERS = [
-  "Data/Hora", "Nome", "WhatsApp", "WhatsApp (link)", "Perfil",
+  "Data/Hora", "Tracking ID", "Nome", "WhatsApp", "WhatsApp (link)", "Perfil",
   "Barras", "O que trava", "Progressão", "Tempo tentando", "Comprometimento",
-  "UTM Source", "UTM Campaign", "Status Pix"
+  "UTM Source", "UTM Medium", "UTM Campaign", "UTM Content", "UTM Term", "FBCLID",
+  "Landing Page", "Referrer", "Primeira Visita", "Lead Event ID", "Status Pix"
 ];
 
 function doPost(e) {
@@ -32,6 +38,7 @@ function doPost(e) {
 
   sheet.appendRow([
     new Date(),
+    data.tracking_id || "",
     data.nome || "",
     data.whatsapp || "",
     whatsappLink,
@@ -42,7 +49,15 @@ function doPost(e) {
     data.respostas?.tempoTentando || "",
     data.respostas?.comprometimento || "",
     data.utm_source || "",
+    data.utm_medium || "",
     data.utm_campaign || "",
+    data.utm_content || "",
+    data.utm_term || "",
+    data.fbclid || "",
+    data.landing_page || "",
+    data.referrer || "",
+    data.first_visit_at || "",
+    data.lead_event_id || "",
     "Pendente"
   ]);
 
@@ -57,10 +72,17 @@ function getOrCreateSheet_() {
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
   }
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(HEADERS);
+
+  const headerAtual = sheet.getLastRow() > 0
+    ? sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
+    : [];
+  const precisaAtualizarHeader = HEADERS.some((h, i) => headerAtual[i] !== h);
+  if (precisaAtualizarHeader) {
+    const range = sheet.getRange(1, 1, 1, HEADERS.length);
+    range.setValues([HEADERS]);
     sheet.setFrozenRows(1);
-    sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight("bold");
+    range.setFontWeight("bold");
   }
+
   return sheet;
 }

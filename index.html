@@ -240,6 +240,23 @@
 </head>
 <body>
 
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1539676747360822');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1539676747360822&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel -->
+
 <canvas id="canvas-p"></canvas>
 
 <!-- Barra de Progresso -->
@@ -330,16 +347,88 @@
 
 <script>
 /* ============================================================
+   ATRIBUIÇÃO — UTM/fbclid capturados no primeiro toque e um
+   tracking_id de sessão/lead, persistidos em localStorage pra
+   sobreviver a navegação e reload durante todo o funil.
+   Estratégia: first-touch (não sobrescreve se já existir).
+============================================================ */
+const ATRIB_KEY = "mu_attribution";
+const TRACKING_ID_KEY = "mu_tracking_id";
+
+function gerarId() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === "x" ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
+function capturarAtribuicao() {
+  let atrib = null;
+  try { atrib = JSON.parse(localStorage.getItem(ATRIB_KEY)); } catch (e) {}
+  if (atrib) return atrib;
+
+  const params = new URLSearchParams(location.search);
+  atrib = {
+    utm_source: params.get("utm_source") || "",
+    utm_medium: params.get("utm_medium") || "",
+    utm_campaign: params.get("utm_campaign") || "",
+    utm_content: params.get("utm_content") || "",
+    utm_term: params.get("utm_term") || "",
+    fbclid: params.get("fbclid") || "",
+    landing_page: location.pathname + location.search,
+    referrer: document.referrer || "",
+    first_visit_at: new Date().toISOString(),
+  };
+  try { localStorage.setItem(ATRIB_KEY, JSON.stringify(atrib)); } catch (e) {}
+  return atrib;
+}
+
+function obterTrackingId() {
+  let id = null;
+  try { id = localStorage.getItem(TRACKING_ID_KEY); } catch (e) {}
+  if (!id) {
+    id = gerarId();
+    try { localStorage.setItem(TRACKING_ID_KEY, id); } catch (e) {}
+  }
+  return id;
+}
+
+const ATRIBUICAO = capturarAtribuicao();
+const TRACKING_ID = obterTrackingId();
+
+/* ============================================================
+   META PIXEL — cada evento leva um event_id próprio, gerado aqui.
+   Quando a Conversions API (server-side) existir, ela deve reusar
+   esse MESMO event_id pra deduplicar com o evento do navegador.
+============================================================ */
+const META_EVENTOS_PADRAO = new Set([
+  "PageView", "Lead", "ViewContent", "InitiateCheckout", "Purchase"
+]);
+
+function trackMeta(eventName, customData) {
+  const eventId = gerarId();
+  if (typeof fbq === "function") {
+    const metodo = META_EVENTOS_PADRAO.has(eventName) ? "track" : "trackCustom";
+    fbq(metodo, eventName, customData || {}, { eventID: eventId });
+  }
+  return eventId;
+}
+
+trackMeta("PageView");
+
+/* ============================================================
    LEADS — Google Sheets (tempo real)
    Cole aqui a URL do Web App do Apps Script (ver instruções enviadas
    junto com essa alteração). Enquanto estiver vazia, nada é enviado.
 ============================================================ */
 const LEADS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbygxfvzgb6999gi0KOmr1ngw2vW43-xP31YsVNKXY-vpWwBk3iXO9KTtoxDYiY6BhiSoA/exec";
 
-function enviarLeadParaPlanilha() {
+function enviarLeadParaPlanilha(leadEventId) {
   if (!LEADS_WEBHOOK_URL) return;
-  const params = new URLSearchParams(location.search);
   const payload = {
+    tracking_id: TRACKING_ID,
+    lead_event_id: leadEventId || "",
     nome: STATE.nome,
     whatsapp: STATE.whatsapp,
     perfil: STATE.perfil,
@@ -350,8 +439,15 @@ function enviarLeadParaPlanilha() {
       tempoTentando: STATE.respostas["p4"]?.texto || "",
       comprometimento: STATE.respostas["p5"]?.texto || ""
     },
-    utm_source: params.get("utm_source") || "",
-    utm_campaign: params.get("utm_campaign") || "",
+    utm_source: ATRIBUICAO.utm_source,
+    utm_medium: ATRIBUICAO.utm_medium,
+    utm_campaign: ATRIBUICAO.utm_campaign,
+    utm_content: ATRIBUICAO.utm_content,
+    utm_term: ATRIBUICAO.utm_term,
+    fbclid: ATRIBUICAO.fbclid,
+    landing_page: ATRIBUICAO.landing_page,
+    referrer: ATRIBUICAO.referrer,
+    first_visit_at: ATRIBUICAO.first_visit_at,
     url: location.href,
     userAgent: navigator.userAgent
   };
@@ -591,6 +687,7 @@ function selecionarOpcao(pergunta, idx, opcao) {
 ============================================================ */
 function iniciarProcessamento() {
   STATE.perfil = identificarPerfil();
+  trackMeta("QuizComplete", { content_name: STATE.perfil });
   renderizarResultado();
   renderizarOferta();
 
@@ -638,14 +735,17 @@ function identificarPerfil() {
    CAPTURA
 ============================================================ */
 $("btn-cap").addEventListener("click", () => {
+  if (STATE.leadEnviado) return; // evita duplicar o Lead em duplo clique
   const nome = $("campo-nome").value.trim();
   const zap  = $("campo-whatsapp").value.trim();
   if (!nome) { $("campo-nome").focus(); return; }
   if (!zap)  { $("campo-whatsapp").focus(); return; }
   STATE.nome = nome;
   STATE.whatsapp = zap;
+  STATE.leadEnviado = true;
   renderizarOferta();
-  enviarLeadParaPlanilha();
+  const leadEventId = trackMeta("Lead");
+  enviarLeadParaPlanilha(leadEventId);
   irParaTela("resultado");
 });
 
@@ -678,7 +778,7 @@ function renderizarResultado() {
     <p class="res-ponte">
       94% das pessoas que ficam travadas no mesmo ponto por meses não param por falta de força — param porque estão tentando resolver um problema técnico com mais volume de treino.
     </p>
-    <button class="res-cta" onclick="irParaTela('oferta')">Ver o Caminho Mais Rápido Agora →</button>
+    <button class="res-cta" onclick="trackMeta('ViewContent'); irParaTela('oferta')">Ver o Caminho Mais Rápido Agora →</button>
     <p class="res-cta-sub">Disponível imediatamente após o próximo passo</p>
   `;
 }
@@ -723,7 +823,19 @@ function renderizarOferta() {
   setTimeout(() => {
     const btn = $("btn-comprar");
     if (btn) btn.addEventListener("click", () => {
-      // window.location.href = "URL_DO_PRODUTO";
+      trackMeta("InitiateCheckout", { value: 19.90, currency: "BRL" });
+      // Query string de atribuição pronta pra anexar na URL do checkout
+      // assim que a plataforma for definida — sem nome/telefone nela.
+      const qs = new URLSearchParams({
+        tracking_id: TRACKING_ID,
+        utm_source: ATRIBUICAO.utm_source,
+        utm_medium: ATRIBUICAO.utm_medium,
+        utm_campaign: ATRIBUICAO.utm_campaign,
+        utm_content: ATRIBUICAO.utm_content,
+        utm_term: ATRIBUICAO.utm_term,
+        fbclid: ATRIBUICAO.fbclid,
+      });
+      // window.location.href = "URL_DO_CHECKOUT?" + qs.toString();
       alert("Redirecionar para página de pagamento");
     });
   }, 100);
@@ -733,9 +845,10 @@ function renderizarOferta() {
    INICIAR
 ============================================================ */
 $("btn-iniciar").addEventListener("click", () => {
+  trackMeta("QuizStart");
   STATE = {
     telaAtual:"quiz", score:0, perguntaAtual:0,
-    respostas:{}, nome:"", whatsapp:"", perfil:null,
+    respostas:{}, nome:"", whatsapp:"", perfil:null, leadEnviado:false,
     multi:{ explosao:0, trajetoria:0, transicao:0, progressao:0, base:0 },
     tempoInicio: Date.now(),
   };
