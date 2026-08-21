@@ -330,6 +330,39 @@
 
 <script>
 /* ============================================================
+   LEADS — Google Sheets (tempo real)
+   Cole aqui a URL do Web App do Apps Script (ver instruções enviadas
+   junto com essa alteração). Enquanto estiver vazia, nada é enviado.
+============================================================ */
+const LEADS_WEBHOOK_URL = "";
+
+function enviarLeadParaPlanilha() {
+  if (!LEADS_WEBHOOK_URL) return;
+  const params = new URLSearchParams(location.search);
+  const payload = {
+    nome: STATE.nome,
+    whatsapp: STATE.whatsapp,
+    perfil: STATE.perfil,
+    respostas: {
+      barras: STATE.respostas["p1"]?.texto || "",
+      trava: STATE.respostas["p2"]?.texto || "",
+      progressao: STATE.respostas["p3"]?.texto || "",
+      tempoTentando: STATE.respostas["p4"]?.texto || ""
+    },
+    utm_source: params.get("utm_source") || "",
+    utm_campaign: params.get("utm_campaign") || "",
+    url: location.href,
+    userAgent: navigator.userAgent
+  };
+  fetch(LEADS_WEBHOOK_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  }).catch(() => {});
+}
+
+/* ============================================================
    PERGUNTAS
 ============================================================ */
 // Reduzido de 10 pra 4 perguntas — só as mais decisivas pra identificar o
@@ -599,6 +632,7 @@ $("btn-cap").addEventListener("click", () => {
   if (!zap)  { $("campo-whatsapp").focus(); return; }
   STATE.nome = nome;
   STATE.whatsapp = zap;
+  enviarLeadParaPlanilha();
   irParaTela("resultado");
 });
 
