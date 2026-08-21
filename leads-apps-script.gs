@@ -17,7 +17,7 @@
 const SHEET_NAME = "Leads";
 const HEADERS = [
   "Data/Hora", "Nome", "WhatsApp", "WhatsApp (link)", "Perfil",
-  "Barras", "O que trava", "Progressão", "Tempo tentando",
+  "Barras", "O que trava", "Progressão", "Tempo tentando", "Comprometimento",
   "UTM Source", "UTM Campaign", "Status Pix"
 ];
 
@@ -40,6 +40,7 @@ function doPost(e) {
     data.respostas?.trava || "",
     data.respostas?.progressao || "",
     data.respostas?.tempoTentando || "",
+    data.respostas?.comprometimento || "",
     data.utm_source || "",
     data.utm_campaign || "",
     "Pendente"

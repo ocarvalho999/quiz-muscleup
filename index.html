@@ -347,7 +347,8 @@ function enviarLeadParaPlanilha() {
       barras: STATE.respostas["p1"]?.texto || "",
       trava: STATE.respostas["p2"]?.texto || "",
       progressao: STATE.respostas["p3"]?.texto || "",
-      tempoTentando: STATE.respostas["p4"]?.texto || ""
+      tempoTentando: STATE.respostas["p4"]?.texto || "",
+      comprometimento: STATE.respostas["p5"]?.texto || ""
     },
     utm_source: params.get("utm_source") || "",
     utm_campaign: params.get("utm_campaign") || "",
@@ -413,6 +414,17 @@ const PERGUNTAS = [
       { letra:"B", texto:"Há alguns meses",             pontos:6,  ind:{progressao:6},      insight:"Meses tentando sem resultado é sinal de bloqueio técnico específico." },
       { letra:"C", texto:"Há mais de 6 meses",          pontos:10, ind:{progressao:10},     insight:"Esse tempo sem evolução confirma: o problema não é força, é método." },
       { letra:"D", texto:"Há mais de 1 ano",            pontos:14, ind:{progressao:12},     insight:"Mais de 1 ano travado? Existe um erro técnico específico ainda não identificado." },
+    ]
+  },
+  {
+    id:"p5", modulo:"COMPROMISSO",
+    texto:"E se existisse um treinamento específico para acelerar sua evolução no Muscle Up, você estaria disposto a seguir por 14 dias?",
+    contexto:"Essa resposta ajuda a calibrar o nível de acompanhamento do seu diagnóstico.",
+    opcoes:[
+      { letra:"A", texto:"Sim, com certeza — quero resultado rápido",        pontos:10, ind:{}, insight:"Perfeito. Compromisso é metade do caminho — a outra metade é ter o método certo." },
+      { letra:"B", texto:"Sim, se o passo a passo for simples de seguir",    pontos:9,  ind:{}, insight:"Faz sentido. Por isso a progressão é dividida em passos simples, um de cada vez." },
+      { letra:"C", texto:"Sim, desde que tenha suporte pra tirar dúvidas",   pontos:9,  ind:{}, insight:"Por isso existe a comunidade no WhatsApp — suporte diário pra você não travar sozinho." },
+      { letra:"D", texto:"Ainda não sei, quero ver meu diagnóstico primeiro",pontos:6,  ind:{}, insight:"Sem problema. Vamos te mostrar exatamente onde você está travando primeiro." },
     ]
   },
 ];
