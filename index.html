@@ -236,6 +236,59 @@
     }
     .garantia-icon { font-size: 22px; flex-shrink: 0; }
     .oferta-prova { font-size: 12px; color: var(--cor-texto-fraco); text-align: center; line-height: 1.5; padding-bottom: 40px; }
+
+    /* ── AUTORIDADE (instrutor) ─────────────────────────────── */
+    #tela-autoridade { padding-top: 32px; }
+    .aut-label {
+      font-size: 11px; font-weight: 800; color: var(--cor-primaria);
+      text-transform: uppercase; letter-spacing: 1.5px; text-align: center; margin-bottom: 6px;
+    }
+    .aut-nome {
+      font-size: 30px; font-weight: 900; text-align: center; line-height: 1.1; margin-bottom: 10px;
+    }
+    .aut-nome span { color: var(--cor-primaria); }
+    .aut-tagline {
+      font-size: 13px; color: var(--cor-texto-suave); text-align: center;
+      line-height: 1.5; margin-bottom: 24px; padding: 0 8px;
+    }
+    .aut-foto-principal {
+      width: 100%; aspect-ratio: 4/5; border-radius: 14px; margin-bottom: 20px;
+      background: var(--cor-card); border: 1px solid var(--cor-borda);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--cor-texto-fraco); font-size: 13px; text-align: center; overflow: hidden;
+    }
+    .aut-foto-principal img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .aut-antes-depois { display: flex; gap: 10px; margin-bottom: 24px; }
+    .aut-ad-item { flex: 1; text-align: center; }
+    .aut-ad-foto {
+      width: 100%; aspect-ratio: 3/4; border-radius: 10px; margin-bottom: 8px;
+      background: var(--cor-card); border: 1px solid var(--cor-borda);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--cor-texto-fraco); font-size: 11px; overflow: hidden;
+    }
+    .aut-ad-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .aut-ad-label {
+      font-size: 11px; font-weight: 800; color: var(--cor-primaria);
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .aut-bio { font-size: 14px; color: var(--cor-texto-suave); line-height: 1.7; margin-bottom: 22px; }
+    .aut-bio p { margin-bottom: 14px; }
+    .aut-bio strong { color: var(--cor-texto); }
+    .aut-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px;
+    }
+    .aut-card {
+      background: var(--cor-card); border: 1px solid var(--cor-borda);
+      border-radius: 12px; padding: 16px;
+    }
+    .aut-card-icon { font-size: 18px; margin-bottom: 8px; }
+    .aut-card-titulo { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
+    .aut-card-sub { font-size: 12px; color: var(--cor-texto-fraco); line-height: 1.4; }
+    .aut-cta {
+      width: 100%; padding: 18px; background: var(--cor-primaria); color: #000;
+      font-size: 15px; font-weight: 900; border: none; border-radius: 10px;
+      cursor: pointer; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 32px;
+    }
   </style>
 </head>
 <body>
@@ -338,6 +391,67 @@ src="https://www.facebook.com/tr?id=1539676747360822&ev=PageView&noscript=1"
 <!-- RESULTADO -->
 <section class="tela" id="tela-resultado">
   <div id="res-conteudo"></div>
+</section>
+
+<!-- AUTORIDADE (instrutor) -->
+<section class="tela" id="tela-autoridade">
+  <p class="aut-label">Conheça seu instrutor</p>
+  <h2 class="aut-nome">Bruno <span>Carvalho</span></h2>
+  <p class="aut-tagline">Especialista em Calistenia e Muscle-Up — mais de 4 anos transformando corpos e conquistas na barra</p>
+
+  <div class="aut-foto-principal">
+    <!-- TODO: trocar por <img src="assets/instrutor-bruno.jpg" alt="Bruno Carvalho"> -->
+    📷 Foto do Bruno
+  </div>
+
+  <div class="aut-antes-depois">
+    <div class="aut-ad-item">
+      <div class="aut-ad-foto">
+        <!-- TODO: trocar por <img src="assets/instrutor-antes.jpg" alt="Antes"> -->
+        📷 Antes
+      </div>
+      <p class="aut-ad-label">Antes</p>
+    </div>
+    <div class="aut-ad-item">
+      <div class="aut-ad-foto">
+        <!-- TODO: trocar por <img src="assets/instrutor-depois.jpg" alt="Depois"> -->
+        📷 Depois
+      </div>
+      <p class="aut-ad-label">Depois</p>
+    </div>
+  </div>
+
+  <div class="aut-bio">
+    <p><strong>Fala, galera da barra! Eu sou o Bruno Carvalho.</strong></p>
+    <p>Treino calistenia há mais de 4 anos e saí desse corpo aqui para esse corpo aqui.</p>
+    <p>Criei esse método com base em tudo que eu precisei fazer na prática para dominar o Muscle-Up mais avançado da calistenia.</p>
+    <p>Nos últimos anos ajudei dezenas de alunos a saírem do zero e conquistarem o primeiro Muscle-Up — alguns em menos de 2 semanas. Agora eu quero te mostrar o caminho mais rápido e direto que eu usei.</p>
+  </div>
+
+  <div class="aut-grid">
+    <div class="aut-card">
+      <div class="aut-card-icon">⚡</div>
+      <p class="aut-card-titulo">Rápido de aprender</p>
+      <p class="aut-card-sub">Método simplificado e progressivo</p>
+    </div>
+    <div class="aut-card">
+      <div class="aut-card-icon">💰</div>
+      <p class="aut-card-titulo">Barato pra começar</p>
+      <p class="aut-card-sub">Apenas R$ 19,90</p>
+    </div>
+    <div class="aut-card">
+      <div class="aut-card-icon">📈</div>
+      <p class="aut-card-titulo">Resultados reais</p>
+      <p class="aut-card-sub">Alunos fazendo em 2 semanas</p>
+    </div>
+    <div class="aut-card">
+      <div class="aut-card-icon">👥</div>
+      <p class="aut-card-titulo">Comunidade exclusiva</p>
+      <p class="aut-card-sub">Eu dentro tirando dúvidas todo dia</p>
+    </div>
+  </div>
+
+  <button class="aut-cta" onclick="trackMeta('ViewContent'); irParaTela('oferta')">Ver Minha Oferta Personalizada →</button>
 </section>
 
 <!-- OFERTA -->
@@ -778,7 +892,7 @@ function renderizarResultado() {
     <p class="res-ponte">
       94% das pessoas que ficam travadas no mesmo ponto por meses não param por falta de força — param porque estão tentando resolver um problema técnico com mais volume de treino.
     </p>
-    <button class="res-cta" onclick="trackMeta('ViewContent'); irParaTela('oferta')">Ver o Caminho Mais Rápido Agora →</button>
+    <button class="res-cta" onclick="irParaTela('autoridade')">Ver o Caminho Mais Rápido Agora →</button>
     <p class="res-cta-sub">Disponível imediatamente após o próximo passo</p>
   `;
 }
