@@ -326,13 +326,12 @@ src="https://www.facebook.com/tr?id=1539676747360822&ev=PageView&noscript=1"
   <div class="splash-content">
     <div class="splash-badge"><span class="badge-dot"></span>Desafio Muscle Up em 14 Dias</div>
     <h1 class="splash-headline">
-      🚨 Você está cometendo um dos <em>5 erros</em> que impedem 87% dos praticantes de fazer o primeiro Muscle Up?
+      🚨 Você comete um dos <em>5 erros</em> que impedem 87% dos praticantes de fazer o primeiro Muscle Up?
     </h1>
     <p class="splash-sub">
-      A maioria acredita que precisa ficar mais forte.<br>
-      Mas os melhores treinadores de calistenia concordam:<br><br>
-      <strong>O verdadeiro problema costuma ser técnica, explosão ou progressão.</strong><br><br>
-      Faça o diagnóstico rápido e descubra exatamente o que está travando o seu Muscle Up — e como corrigir isso em até 14 dias de treino.
+      A maioria acha que precisa ficar mais forte.<br><br>
+      Mas o verdadeiro problema costuma estar na técnica, explosão ou progressão.<br><br>
+      Faça o diagnóstico rápido e descubra como corrigir e destravar o muscle up em até 14 dias de treino.
     </p>
     <div class="splash-proof">
       <div class="splash-proof-item">🔥 <span>+1.200 diagnósticos realizados</span></div>
@@ -631,7 +630,6 @@ const PERGUNTAS = [
       { letra:"A", texto:"Sim, com certeza — quero resultado rápido",        pontos:10, ind:{}, insight:"Perfeito. Compromisso é metade do caminho — a outra metade é ter o método certo." },
       { letra:"B", texto:"Sim, se o passo a passo for simples de seguir",    pontos:9,  ind:{}, insight:"Faz sentido. Por isso a progressão é dividida em passos simples, um de cada vez." },
       { letra:"C", texto:"Sim, desde que tenha suporte pra tirar dúvidas",   pontos:9,  ind:{}, insight:"Por isso existe a comunidade no WhatsApp — suporte diário pra você não travar sozinho." },
-      { letra:"D", texto:"Ainda não sei, quero ver meu diagnóstico primeiro",pontos:6,  ind:{}, insight:"Sem problema. Vamos te mostrar exatamente onde você está travando primeiro." },
     ]
   },
 ];
@@ -677,12 +675,12 @@ const PERFIS = {
     badge: "📈 PERFIL: PROGRESSÃO ERRADA",
     titulo: "Você está treinando muito.\nMas treinando etapas fora da ordem.",
     copy: [
-      "Isso gera esforço. Mas não gera evolução.",
-      "O Muscle Up é um movimento com etapas muito específicas. Tentar o movimento completo sem dominar cada etapa separadamente é como tentar escrever uma redação sem conhecer as letras.",
-      "Você pode ter força suficiente. Mas está aplicando ela da maneira e na ordem errada.",
+      "Talvez você já treine há meses. Talvez esteja começando agora. Ou talvez você chegue perto do Muscle Up… e trave sempre no mesmo ponto.",
+      "O problema quase nunca é falta de força. É que a maioria tenta o movimento completo antes de preparar as 3 partes que realmente fazem ele acontecer.",
+      "Não é treinar mais. É treinar os 3 pontos certos.",
     ],
-    destaque: "Uma progressão estruturada divide o Muscle Up em 5 fases. A maioria das pessoas pula direto para a tentativa do movimento completo — e fica presa no mesmo lugar por meses ou anos.",
-    ofertaConector: "Seu diagnóstico é claro: o problema não é força — é a ordem do treino. Com a progressão correta, alunos com exatamente esse perfil conquistam o Muscle Up em menos de 2 meses — os mais dedicados, em até 14 dias.",
+    destaque: "Com cerca de 30 minutos, de forma específica, você para de forçar o Muscle Up e começa a construir exatamente o que está faltando. O resto fica muito mais simples.",
+    ofertaConector: "seu diagnóstico é claro. O problema não é falta de força. É a ordem do treino.",
   },
   base: {
     badge: "🏗️ PERFIL: BASE INCOMPLETA",
@@ -907,15 +905,16 @@ function renderizarOferta() {
       ${nome}, ${p.ofertaConector}
     </h2>
     <p class="oferta-sub">
-      Centenas de praticantes ficam meses ou anos tentando aprender Muscle Up porque treinam sem uma progressão estruturada.<br><br>
-      O <strong style="color:var(--cor-texto)">Desafio Muscle Up em 14 Dias</strong> é o sistema de correção dos 5 erros que impedem o primeiro Muscle Up.
+      Alunos com exatamente esse perfil conquistam o primeiro Muscle Up em menos de 2 meses. Os mais dedicados, em até 14 dias.<br><br>
+      A maioria fica meses (ou anos) tentando porque treina sem uma progressão estruturada.<br><br>
+      O <strong style="color:var(--cor-texto)">Desafio Muscle Up em 14 Dias</strong> é o sistema que corrige os 5 erros que impedem o primeiro Muscle Up.
     </p>
     <div class="oferta-itens">
-      <div class="oferta-item"><span class="oferta-check">✓</span><span>Progressão completa em 5 fases — da base ao Muscle Up completo</span></div>
-      <div class="oferta-item"><span class="oferta-check">✓</span><span>Correção específica para o seu perfil: <strong>${p.badge}</strong></span></div>
-      <div class="oferta-item"><span class="oferta-check">✓</span><span>Acesso à comunidade no WhatsApp — acompanhamento e resposta de dúvidas todos os dias</span></div>
-      <div class="oferta-item"><span class="oferta-check">✓</span><span>Exercícios explosivos e de transição que 90% dos praticantes nunca treinam</span></div>
-      <div class="oferta-item"><span class="oferta-check">✓</span><span>Acesso imediato — comece hoje mesmo</span></div>
+      <div class="oferta-item"><span class="oferta-check">✓</span><span>Progressão completa em 5 fases</span></div>
+      <div class="oferta-item"><span class="oferta-check">✓</span><span>Correção específica pro seu perfil: <strong>${p.badge}</strong></span></div>
+      <div class="oferta-item"><span class="oferta-check">✓</span><span>Exercícios de explosão e transição que 90% nunca treina</span></div>
+      <div class="oferta-item"><span class="oferta-check">✓</span><span>Comunidade no WhatsApp com acompanhamento diário</span></div>
+      <div class="oferta-item"><span class="oferta-check">✓</span><span>Acesso imediato — comece hoje</span></div>
     </div>
     <div class="preco-box">
       <p class="preco-de">De R$ 87,90</p>
@@ -926,7 +925,7 @@ function renderizarOferta() {
     <button class="btn-oferta" id="btn-comprar">Quero Entrar no Desafio de 14 Dias →</button>
     <div class="oferta-garantia">
       <span class="garantia-icon">🛡️</span>
-      <span>Garantia de 7 dias. Se você não tiver avançado na progressão, devolvemos 100% do valor — sem perguntas.</span>
+      <span>Garantia de 30 dias. Se você não tiver avançado na progressão, devolvemos 100% do valor — sem perguntas.</span>
     </div>
     <p class="oferta-prova">Baseado em +500 alunos • A maioria conquista o Muscle Up em até 2 meses, os mais dedicados em até 14 dias</p>
   `;
