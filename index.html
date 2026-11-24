@@ -934,10 +934,8 @@ function renderizarOferta() {
     const btn = $("btn-comprar");
     if (btn) btn.addEventListener("click", () => {
       trackMeta("InitiateCheckout", { value: 19.90, currency: "BRL" });
-      // GGCheckout confirma suporte a utm_source/medium/campaign/content/term
-      // na URL, ecoados de volta no webhook. tracking_id e fbclid vão junto
-      // por garantia, mas a correspondência do pagamento com o lead usa o
-      // WhatsApp (o GGCheckout não confirma eco de parâmetros não-UTM).
+      // Checkout na Lastlink. UTMs, tracking_id e fbclid seguem na URL para
+      // atribuição; a correspondência do pagamento com o lead usa o WhatsApp.
       const qs = new URLSearchParams({
         tracking_id: TRACKING_ID,
         utm_source: ATRIBUICAO.utm_source,
@@ -947,7 +945,7 @@ function renderizarOferta() {
         utm_term: ATRIBUICAO.utm_term,
         fbclid: ATRIBUICAO.fbclid,
       });
-      window.location.href = "https://ggcheckout.app/checkout/v3/PGZpRilk7mGpwdVcbOtM?" + qs.toString();
+      window.location.href = "https://lastlink.com/p/CF831632A/checkout-payment/?" + qs.toString();
     });
   }, 100);
 }
