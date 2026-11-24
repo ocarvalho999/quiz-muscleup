@@ -1,8 +1,8 @@
 /**
  * Recebe os leads do quiz (nome, WhatsApp, respostas, perfil, atribuição
  * de campanha) e grava em tempo real numa aba da planilha. Também recebe
- * atualizações de status de pagamento vindas do webhook do GGCheckout
- * (via api/ggcheckout-webhook.js na Vercel), casando pelo WhatsApp.
+ * atualizações de status de pagamento vindas do webhook da Lastlink
+ * (via api/lastlink-webhook.js na Vercel), casando pelo WhatsApp.
  *
  * SETUP:
  * 1. Crie uma planilha nova no Google Sheets.
